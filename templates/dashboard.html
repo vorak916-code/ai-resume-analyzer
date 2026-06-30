@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Upload Profile Document</h5>
+                <form action="/analyze" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Only standard structure PDF documents accepted</label>
+                        <input type="file" name="resume" class="form-control" accept=".pdf" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Execute Model Assessment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">System Evaluation Archival History</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>File Label</th>
+                                <th>Aggregated Score</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td>{{ record.timestamp }}</td>
+                                <td>{{ record.filename }}</td>
+                                <td><span class="badge bg-primary fs-6">{{ record.score }}/100</span></td>
+                                <td><a href="/report/{{ record.id }}" class="btn btn-sm btn-outline-secondary">Open Matrix</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Analysis Report: <span class="text-muted small">{{ report.filename }}</span></h2>
+    <div>
+        <a href="/export/csv/{{ report.id }}" class="btn btn-outline-dark btn-sm">Export CSV</a>
+        <a href="/export/json/{{ report.id }}" class="btn btn-outline-dark btn-sm">Export JSON API payload</a>
+        <a href="/dashboard" class="btn btn-secondary btn-sm">Dashboard</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center text-white bg-dark shadow-sm h-100">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <h3>Overall Quality Score</h3>
+                <h1 class="display-2 font-weight-bold">{{ report.score }}</h1>
+                <p class="mb-0">Out of 100 maximum metric units</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Score Distributions Visualization</h5>
+                <canvas id="scoreChart" style="max-height: 220px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="text-primary">Skills Extracted</h5>
+                {% for skill in report.data.skills %}
+                    <span class="badge bg-secondary p-2 m-1">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="text-success">Strategic Role Target Matches</h5>
+                <ul class="list-group list-group-flush">
+                {% for role in report.data.recommended_roles %}
+                    <li class="list-group-item">{{ role }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm bg-warning-subtle mb-4">
+            <div class="card-body">
+                <h5 class="text-warning-heading">AI Recruiter Optimization Advice</h5>
+                <ul>
+                {% for recommendation in report.data.ai_suggestions %}
+                    <li class="mb-2">{{ recommendation }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Total Profile Score', 'Keyword Density Score'],
+            datasets: [{
+                label: 'ATS Scoring Performance Metric',
+                data: [{{ report.score }}, {{ report.data.calculated_keyword_match or 50 }}],
+                backgroundColor: ['#0d6efd', '#198754']
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, max: 100 } }
+        }
+    });
+</script>
+{% endblock %}
